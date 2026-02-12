@@ -14,8 +14,6 @@
         .divider { margin: 25px 0; color: #444; font-size: 14px; display: flex; align-items: center; justify-content: center; }
         .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #222; margin: 0 10px; }
         .btn-google { width: 100%; padding: 14px; background: white; color: black; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
-        .links { margin-top: 25px; font-size: 14px; color: #aaa; }
-        .links a { color: var(--p); text-decoration: none; font-weight: bold; display: inline-block; margin-top: 10px; }
         #errorMessage { color: #ff4757; font-size: 13px; margin-bottom: 15px; display: none; background: rgba(255, 71, 87, 0.1); padding: 10px; border-radius: 10px; }
     </style>
 </head>
@@ -32,9 +30,6 @@
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
         متابعة باستخدام Google
     </button>
-    <div class="links">
-        <a href="register.html">إنشاء حساب جديد</a>
-    </div>
 </div>
 
 <script type="module">
@@ -52,18 +47,17 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    // مراقب الحالة العامة
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            setTimeout(() => {
-                window.location.replace("index.html");
-            }, 500);
+            window.location.replace("index.html");
         }
     });
 
+    // تسجيل الدخول العادي
     document.getElementById('loginBtn').onclick = async () => {
         const e = document.getElementById('email').value;
         const p = document.getElementById('pass').value;
-        if (!e || !p) return;
         try {
             await setPersistence(auth, browserLocalPersistence);
             await signInWithEmailAndPassword(auth, e, p);
@@ -72,12 +66,18 @@
         }
     };
 
+    // تسجيل الدخول بجوجل (الحل المحدث)
     document.getElementById('googleBtn').onclick = async () => {
         try {
             await setPersistence(auth, browserLocalPersistence);
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            if (result.user) {
+                // توجيه يدوي فوري بعد النجاح
+                window.location.assign("index.html");
+            }
         } catch (err) {
-            showError("فشل الاتصال بجوجل");
+            console.error(err);
+            showError("فشل الدخول عبر جوجل، تأكد من إعدادات Firebase");
         }
     };
 
