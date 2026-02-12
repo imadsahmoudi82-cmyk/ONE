@@ -6,37 +6,47 @@
     <title>الرئيسية | ONE 1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --p: #6c5ce7; --bg: #ffffff; --text: #1a1a1a; --gray: #f8f9fa; }
-        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
+        :root { --p: #6c5ce7; --bg: #ffffff; --text: #1a1a1a; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 70px; }
 
-        /* شريط البحث العلوي */
-        .header { position: sticky; top: 0; background: #000; padding: 12px 15px; display: flex; align-items: center; gap: 10px; z-index: 1000; }
-        .logo { color: var(--p); font-weight: 900; font-size: 20px; }
-        .search-bar { flex: 1; background: #222; border-radius: 25px; display: flex; align-items: center; padding: 8px 15px; }
-        .search-bar input { background: none; border: none; color: white; width: 100%; outline: none; font-size: 14px; text-align: right; }
-        .search-bar i { color: #888; margin-left: 8px; }
-        .user-icon { color: white; font-size: 22px; cursor: pointer; }
+        /* الهيدر العلوي */
+        .header { position: sticky; top: 0; background: #000; padding: 10px 15px; display: flex; align-items: center; gap: 10px; z-index: 1000; height: 50px; }
+        .logo { color: var(--p); font-weight: 900; font-size: 18px; }
+        .search-bar { flex: 1; background: #1a1a1a; border-radius: 20px; display: flex; align-items: center; padding: 6px 12px; }
+        .search-bar input { background: none; border: none; color: white; width: 100%; outline: none; font-size: 13px; text-align: right; }
+        .search-bar i { color: #666; margin-left: 6px; font-size: 14px; }
+        .user-icon { color: white; font-size: 20px; }
 
-        /* المحتوى الرئيسي */
-        .main-content { padding: 100px 20px; text-align: center; }
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #bbb; }
-        .empty-state i { font-size: 80px; margin-bottom: 20px; color: #eee; }
-        .empty-state h2 { font-size: 24px; color: #999; margin: 0; }
-        .empty-state p { font-size: 16px; margin-top: 10px; }
+        /* المحتوى */
+        .main-content { padding: 80px 20px; text-align: center; }
+        .empty-state i { font-size: 100px; color: #f0f0f0; margin-bottom: 20px; }
+        .empty-state h2 { color: #999; font-size: 22px; margin: 10px 0; }
+        .empty-state p { color: #ccc; font-size: 15px; }
 
-        /* زر الإضافة العائم */
-        .fab { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 65px; height: 65px; background: var(--p); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); border: 4px solid white; cursor: pointer; z-index: 1001; }
-
-        /* شريط التنقل السفلي */
-        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { color: #bbb; font-size: 22px; cursor: pointer; transition: 0.3s; position: relative; }
+        /* شريط التنقل السفلي (مثل الصورة) */
+        .nav-bottom { 
+            position: fixed; bottom: 0; width: 100%; background: #fff; 
+            display: flex; justify-content: space-around; align-items: center; 
+            height: 65px; border-top: 1px solid #eee; z-index: 1000; 
+        }
+        .nav-item { color: #ccc; font-size: 22px; cursor: pointer; flex: 1; text-align: center; }
         .nav-item.active { color: var(--p); }
+
+        /* زر الزائد (+) المتناسق جداً */
+        .fab-container { position: relative; top: -15px; flex: 1; display: flex; justify-content: center; }
+        .fab { 
+            width: 52px; height: 52px; background: var(--p); 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; color: white; font-size: 22px; 
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3); 
+            border: 4px solid #fff; cursor: pointer; 
+        }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <i class="fa-regular fa-circle-user user-icon" id="profileBtn"></i>
+        <i class="fa-regular fa-circle-user user-icon"></i>
         <div class="search-bar">
             <input type="text" placeholder="ابحث في وان 1...">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -52,20 +62,23 @@
         </div>
     </div>
 
-    <div class="fab">
-        <i class="fa-solid fa-plus"></i>
-    </div>
-
     <nav class="nav-bottom">
-        <i class="fa-solid fa-house nav-item active"></i>
-        <i class="fa-regular fa-heart nav-item"></i>
-        <div style="width: 50px;"></div> <i class="fa-regular fa-comment-dots nav-item"></i>
         <i class="fa-regular fa-user nav-item"></i>
+        <i class="fa-regular fa-comment-dots nav-item"></i>
+        
+        <div class="fab-container">
+            <div class="fab">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+        </div>
+
+        <i class="fa-regular fa-heart nav-item"></i>
+        <i class="fa-solid fa-house nav-item active"></i>
     </nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const config = { 
         apiKey: "AIzaSyDj1jWQZHnELXe_eFkfGpi3F3_jPGhPm7I", 
@@ -77,19 +90,9 @@
     const app = initializeApp(config);
     const auth = getAuth(app);
 
-    // التأكد من أن المستخدم سجل دخوله
     onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "auth.html";
-        }
+        if (!user) window.location.href = "auth.html";
     });
-
-    // تسجيل الخروج عند الضغط على أيقونة البروفايل (تجريبي)
-    document.getElementById('profileBtn').onclick = () => {
-        if(confirm("هل تريد تسجيل الخروج؟")) {
-            signOut(auth).then(() => { window.location.href = "auth.html"; });
-        }
-    };
 </script>
 
 </body>
