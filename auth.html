@@ -40,7 +40,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signInWithRedirect, onAuthStateChanged, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const config = { 
         apiKey: "AIzaSyDj1jWQZHnELXe_eFkfGpi3F3_jPGhPm7I", 
@@ -53,28 +53,45 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
+    // مراقب الحالة: إذا سجل الدخول، انقله فوراً
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            window.location.replace("index.html");
+            window.location.href = "index.html";
         }
     });
 
+    // تسجيل الدخول العادي
     document.getElementById('loginBtn').onclick = async () => {
         const e = document.getElementById('email').value;
         const p = document.getElementById('pass').value;
         if (!e || !p) return;
         try {
             await signInWithEmailAndPassword(auth, e, p);
+            window.location.href = "index.html";
         } catch (err) {
-            const d = document.getElementById('errorMessage');
-            d.textContent = "خطأ في البيانات";
-            d.style.display = 'block';
+            showError("بيانات الدخول غير صحيحة");
         }
     };
 
-    document.getElementById('googleBtn').onclick = () => {
-        signInWithRedirect(auth, provider);
+    // تسجيل الدخول بجوجل (باستخدام النافذة المنبثقة لضمان النقل)
+    document.getElementById('googleBtn').onclick = async () => {
+        try {
+            await signInWithPopup(auth, provider);
+            window.location.href = "index.html";
+        } catch (err) {
+            if (err.code === 'auth/popup-blocked') {
+                showError("يرجى السماح بالنوافذ المنبثقة في متصفحك");
+            } else {
+                showError("فشل تسجيل الدخول عبر جوجل");
+            }
+        }
     };
+
+    function showError(msg) {
+        const d = document.getElementById('errorMessage');
+        d.textContent = msg;
+        d.style.display = 'block';
+    }
 </script>
 
 </body>
