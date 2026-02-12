@@ -14,13 +14,12 @@
         .divider { margin: 25px 0; color: #444; font-size: 14px; display: flex; align-items: center; justify-content: center; }
         .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #222; margin: 0 10px; }
         .btn-google { width: 100%; padding: 14px; background: white; color: black; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; }
+        .links { margin-top: 25px; font-size: 14px; color: #aaa; }
+        .links a { color: var(--p); text-decoration: none; font-weight: bold; display: inline-block; margin-top: 10px; }
         #errorMessage { color: #ff4757; font-size: 13px; margin-bottom: 15px; display: none; background: rgba(255, 71, 87, 0.1); padding: 10px; border-radius: 10px; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
     </style>
 </head>
 <body>
-
-<div id="loading" class="loading-overlay">جاري التحقق...</div>
 
 <div class="auth-card">
     <div class="logo">ONE 1</div>
@@ -33,14 +32,14 @@
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
         متابعة باستخدام Google
     </button>
-    <div class="links" style="margin-top: 25px; font-size: 14px; color: #aaa;">
-        <a href="register.html" style="color: var(--p); text-decoration: none;">إنشاء حساب جديد</a>
+    <div class="links">
+        <a href="register.html">إنشاء حساب جديد</a>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     const config = { 
         apiKey: "AIzaSyDj1jWQZHnELXe_eFkfGpi3F3_jPGhPm7I", 
@@ -53,48 +52,41 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // 1. التقاط نتيجة إعادة التوجيه (هذا السطر يحل مشكلة العودة لصفحة الدخول)
-    getRedirectResult(auth).then((result) => {
-        if (result?.user) {
-            window.location.replace("index.html");
-        }
-    }).catch((error) => {
-        if (error.code !== 'auth/popup-closed-by-user') {
-            showError("فشل تسجيل الدخول: " + error.message);
-        }
-    });
-
-    // 2. مراقب حالة الدخول العام
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            window.location.replace("index.html");
+            setTimeout(() => {
+                window.location.replace("index.html");
+            }, 500);
         }
     });
 
-    // تسجيل الدخول بجوجل
-    document.getElementById('googleBtn').onclick = () => {
-        document.getElementById('loading').style.display = 'flex';
-        signInWithRedirect(auth, provider);
-    };
-
-    // تسجيل الدخول العادي
     document.getElementById('loginBtn').onclick = async () => {
         const e = document.getElementById('email').value;
         const p = document.getElementById('pass').value;
         if (!e || !p) return;
         try {
+            await setPersistence(auth, browserLocalPersistence);
             await signInWithEmailAndPassword(auth, e, p);
         } catch (err) {
-            showError("بيانات الدخول غير صحيحة");
+            showError("خطأ في بيانات الدخول");
         }
     };
 
-    function showError(msg) {
+    document.getElementById('googleBtn').onclick = async () => {
+        try {
+            await setPersistence(auth, browserLocalPersistence);
+            await signInWithPopup(auth, provider);
+        } catch (err) {
+            showError("فشل الاتصال بجوجل");
+        }
+    };
+
+    function showError(m) {
         const d = document.getElementById('errorMessage');
-        document.getElementById('loading').style.display = 'none';
-        d.textContent = msg;
+        d.textContent = m;
         d.style.display = 'block';
     }
 </script>
+
 </body>
 </html>
