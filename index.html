@@ -3,31 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة توثيق حسابات وان 1</title>
+    <title>إدارة توثيق ONE 1</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .admin-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
-        h2 { color: #6c5ce7; margin-bottom: 10px; font-size: 22px; }
-        p { color: #777; font-size: 14px; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s; box-sizing: border-box; text-align: center; font-size: 16px; }
-        input:focus { border-color: #6c5ce7; }
-        button { width: 100%; background: #6c5ce7; color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 15px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
-        .status { margin-top: 15px; font-size: 13px; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0f0c29; background: linear-gradient(to bottom, #24243e, #302b63, #0f0c29); display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; color: white; }
+        .admin-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px 30px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        h2 { color: #a29bfe; margin-bottom: 5px; font-size: 24px; }
+        .sub-title { color: #ccc; font-size: 13px; margin-bottom: 30px; display: block; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; background: rgba(0,0,0,0.2); border: 2px solid rgba(162, 155, 254, 0.3); border-radius: 15px; outline: none; transition: 0.3s; box-sizing: border-box; text-align: center; font-size: 16px; color: white; }
+        input:focus { border-color: #6c5ce7; background: rgba(0,0,0,0.4); }
+        button { width: 100%; background: #6c5ce7; color: white; border: none; padding: 15px; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(108, 92, 231, 0.2); }
+        button:hover { background: #5b4cc4; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        
+        #statusDisplay { margin-top: 25px; padding: 12px; border-radius: 12px; font-size: 14px; min-height: 20px; transition: 0.3s; display: none; }
+        .msg-info { background: rgba(162, 155, 254, 0.1); color: #a29bfe; border: 1px solid rgba(162, 155, 254, 0.2); }
+        .msg-success { background: rgba(0, 184, 148, 0.1); color: #00b894; border: 1px solid rgba(0, 184, 148, 0.2); }
+        .msg-error { background: rgba(255, 118, 117, 0.1); color: #ff7675; border: 1px solid rgba(255, 118, 117, 0.2); }
     </style>
 </head>
 <body>
 
     <div class="admin-card">
-        <i class="fas fa-user-shield" style="font-size: 40px; color: #6c5ce7; margin-bottom: 15px;"></i>
-        <h2>منصة توثيق حسابات وان 1</h2>
-        <p>أدخل بريد المستخدم لمنحه الشارة البنفسجية</p>
+        <div style="margin-bottom: 20px;">
+            <i class="fas fa-certificate" style="font-size: 50px; color: #a29bfe; filter: drop-shadow(0 0 10px #6c5ce7);"></i>
+        </div>
+        <h2>منصة التوثيق</h2>
+        <span class="sub-title">إدارة حسابات تطبيق ONE 1</span>
         
-        <input type="email" id="userEmail" placeholder="example@mail.com">
-        <button id="verifyBtn">توثيق الحساب الآن</button>
+        <div class="input-group">
+            <input type="email" id="userEmail" placeholder="أدخل بريد الحساب المراد توثيقه">
+        </div>
         
-        <div id="statusMsg" class="status"></div>
+        <button id="verifyBtn">منح شارة التوثيق</button>
+        
+        <div id="statusDisplay"></div>
     </div>
 
     <script type="module">
@@ -44,34 +55,47 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        const statusBox = document.getElementById('statusDisplay');
+
+        function showStatus(text, type) {
+            statusBox.innerText = text;
+            statusBox.className = ''; 
+            statusBox.classList.add(type);
+            statusBox.style.display = 'block';
+        }
+
         document.getElementById('verifyBtn').onclick = async () => {
             const email = document.getElementById('userEmail').value.trim();
-            const msg = document.getElementById('statusMsg');
             
-            if(!email) { alert("أدخل الإيميل أولاً"); return; }
+            if(!email) { 
+                showStatus("يرجى كتابة البريد الإلكتروني أولاً", "msg-error"); 
+                return; 
+            }
 
-            msg.innerText = "جاري البحث عن الحساب...";
-            msg.style.color = "#333";
+            showStatus("جاري التحقق من قاعدة البيانات...", "msg-info");
 
             try {
                 const q = query(collection(db, "users"), where("email", "==", email));
                 const querySnapshot = await getDocs(q);
 
                 if (querySnapshot.empty) {
-                    msg.innerText = "خطأ: هذا الإيميل غير مسجل في النظام";
-                    msg.style.color = "red";
+                    showStatus("عذراً، هذا الحساب غير موجود في وان 1", "msg-error");
                 } else {
+                    let updated = false;
                     querySnapshot.forEach(async (userDoc) => {
                         await updateDoc(doc(db, "users", userDoc.id), {
                             isVerified: true
                         });
-                        msg.innerText = "تم التوثيق بنجاح! الشارة ستظهر للمستخدم الآن";
-                        msg.style.color = "green";
+                        updated = true;
                     });
+                    
+                    if(updated) {
+                        showStatus("تم منح التوثيق بنجاح! الشارة البنفسجية مفعلة الآن", "msg-success");
+                        document.getElementById('userEmail').value = "";
+                    }
                 }
             } catch (e) {
-                msg.innerText = "حدث خطأ أثناء الاتصال";
-                msg.style.color = "red";
+                showStatus("حدث خطأ في الاتصال بالسيرفر", "msg-error");
             }
         };
     </script>
