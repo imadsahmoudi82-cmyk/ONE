@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة توثيق حسابات وان 1</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .admin-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        h2 { color: #6c5ce7; margin-bottom: 10px; font-size: 22px; }
+        p { color: #777; font-size: 14px; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s; box-sizing: border-box; text-align: center; font-size: 16px; }
+        input:focus { border-color: #6c5ce7; }
+        button { width: 100%; background: #6c5ce7; color: white; border: none; padding: 12px; border-radius: 10px; margin-top: 15px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.95); }
+        .status { margin-top: 15px; font-size: 13px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <i class="fas fa-user-shield" style="font-size: 40px; color: #6c5ce7; margin-bottom: 15px;"></i>
+        <h2>منصة توثيق حسابات وان 1</h2>
+        <p>أدخل بريد المستخدم لمنحه الشارة البنفسجية</p>
+        
+        <input type="email" id="userEmail" placeholder="example@mail.com">
+        <button id="verifyBtn">توثيق الحساب الآن</button>
+        
+        <div id="statusMsg" class="status"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyDj1jWQZHnELXe_eFkfGpi3F3_jPGhPm7I", 
+            authDomain: "one1-95c0e.firebaseapp.com", 
+            projectId: "one1-95c0e", 
+            appId: "1:1090900617422:web:f6e9c11bb7a090c39ec89f" 
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById('verifyBtn').onclick = async () => {
+            const email = document.getElementById('userEmail').value.trim();
+            const msg = document.getElementById('statusMsg');
+            
+            if(!email) { alert("أدخل الإيميل أولاً"); return; }
+
+            msg.innerText = "جاري البحث عن الحساب...";
+            msg.style.color = "#333";
+
+            try {
+                const q = query(collection(db, "users"), where("email", "==", email));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    msg.innerText = "خطأ: هذا الإيميل غير مسجل في النظام";
+                    msg.style.color = "red";
+                } else {
+                    querySnapshot.forEach(async (userDoc) => {
+                        await updateDoc(doc(db, "users", userDoc.id), {
+                            isVerified: true
+                        });
+                        msg.innerText = "تم التوثيق بنجاح! الشارة ستظهر للمستخدم الآن";
+                        msg.style.color = "green";
+                    });
+                }
+            } catch (e) {
+                msg.innerText = "حدث خطأ أثناء الاتصال";
+                msg.style.color = "red";
+            }
+        };
+    </script>
+</body>
+</html>
